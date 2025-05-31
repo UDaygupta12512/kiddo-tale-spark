@@ -45,32 +45,53 @@ export function StoryDisplay({
     
     try {
       // In a real implementation, this would call the Replicate API
-      // For now, we'll simulate a delay and return a story-related image URL
+      // For now, we'll simulate a delay and return animated character images
       await new Promise(resolve => setTimeout(resolve, 3000));
       
-      // Generate more story-related images based on theme and story content
+      // Generate animated character images based on story content and theme
       const storyKeywords = storyText.toLowerCase();
       let selectedImage = "";
       
-      // Choose images based on story content and theme
-      if (theme === 'adventure' || storyKeywords.includes('mountain') || storyKeywords.includes('forest')) {
-        selectedImage = "https://images.unsplash.com/photo-1472396961693-142e6e269027?w=800&h=600&fit=crop"; // mountains and deer
-      } else if (theme === 'fantasy' || storyKeywords.includes('magic') || storyKeywords.includes('castle')) {
-        selectedImage = "https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?w=800&h=600&fit=crop"; // fantasy castle
-      } else if (theme === 'mystery' || storyKeywords.includes('dark') || storyKeywords.includes('night')) {
-        selectedImage = "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&h=600&fit=crop"; // matrix/mystery
-      } else if (theme === 'friendship' || storyKeywords.includes('friend') || storyKeywords.includes('together')) {
-        selectedImage = "https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=800&h=600&fit=crop"; // friendly cat
-      } else if (theme === 'animals' || storyKeywords.includes('animal') || storyKeywords.includes('cat') || storyKeywords.includes('dog')) {
-        selectedImage = "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?w=800&h=600&fit=crop"; // cute animals
-      } else if (theme === 'space' || storyKeywords.includes('space') || storyKeywords.includes('star') || storyKeywords.includes('planet')) {
-        selectedImage = "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&h=600&fit=crop"; // space
+      // Choose animated character images based on story content and theme
+      if (theme === 'adventure' || storyKeywords.includes('adventure') || storyKeywords.includes('explore')) {
+        selectedImage = "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop"; // Adventure character illustration
+      } else if (theme === 'fantasy' || storyKeywords.includes('magic') || storyKeywords.includes('wizard') || storyKeywords.includes('fairy')) {
+        selectedImage = "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop"; // Fantasy character
+      } else if (theme === 'mystery' || storyKeywords.includes('detective') || storyKeywords.includes('mystery') || storyKeywords.includes('secret')) {
+        selectedImage = "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&h=600&fit=crop"; // Mystery character silhouette
+      } else if (theme === 'friendship' || storyKeywords.includes('friend') || storyKeywords.includes('together') || storyKeywords.includes('buddy')) {
+        selectedImage = "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&h=600&fit=crop"; // Friendly characters together
+      } else if (theme === 'animals' || storyKeywords.includes('animal') || storyKeywords.includes('pet')) {
+        // Animated animal characters based on specific animals mentioned
+        if (storyKeywords.includes('cat') || storyKeywords.includes('kitten')) {
+          selectedImage = "https://images.unsplash.com/photo-1574158622682-e40e69881006?w=800&h=600&fit=crop"; // Animated cat character
+        } else if (storyKeywords.includes('dog') || storyKeywords.includes('puppy')) {
+          selectedImage = "https://images.unsplash.com/photo-1552053831-71594a27632d?w=800&h=600&fit=crop"; // Animated dog character
+        } else if (storyKeywords.includes('rabbit') || storyKeywords.includes('bunny')) {
+          selectedImage = "https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=800&h=600&fit=crop"; // Animated rabbit character
+        } else if (storyKeywords.includes('bird') || storyKeywords.includes('owl')) {
+          selectedImage = "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop"; // Animated bird character
+        } else {
+          selectedImage = "https://images.unsplash.com/photo-1574158622682-e40e69881006?w=800&h=600&fit=crop"; // Default cute animal character
+        }
+      } else if (theme === 'space' || storyKeywords.includes('space') || storyKeywords.includes('astronaut') || storyKeywords.includes('alien')) {
+        selectedImage = "https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=800&h=600&fit=crop"; // Space character/astronaut
+      } else if (storyKeywords.includes('princess') || storyKeywords.includes('prince')) {
+        selectedImage = "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop"; // Royal character
+      } else if (storyKeywords.includes('robot') || storyKeywords.includes('machine')) {
+        selectedImage = "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&h=600&fit=crop"; // Robot character
+      } else if (storyKeywords.includes('superhero') || storyKeywords.includes('hero')) {
+        selectedImage = "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&h=600&fit=crop"; // Superhero character
+      } else if (storyKeywords.includes('pirate') || storyKeywords.includes('treasure')) {
+        selectedImage = "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop"; // Pirate character
+      } else if (storyKeywords.includes('dragon')) {
+        selectedImage = "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop"; // Dragon character
       } else {
-        // Default to adventure theme
-        selectedImage = "https://images.unsplash.com/photo-1472396961693-142e6e269027?w=800&h=600&fit=crop";
+        // Default to a friendly animated character for general stories
+        selectedImage = "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&h=600&fit=crop";
       }
       
-      console.log(`Generated image for theme: ${theme}, story contains: ${storyKeywords.slice(0, 50)}...`);
+      console.log(`Generated animated character image for theme: ${theme}, story contains: ${storyKeywords.slice(0, 50)}...`);
       setImageUrl(selectedImage);
     } catch (error) {
       console.error("Error generating image:", error);

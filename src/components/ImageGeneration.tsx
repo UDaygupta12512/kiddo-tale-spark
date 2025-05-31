@@ -36,15 +36,15 @@ export function ImageGeneration({
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-kids-purple">Create an Illustration</h3>
-            <p className="text-sm text-gray-500">Let AI create a picture for your story</p>
+            <h3 className="text-lg font-semibold text-kids-purple">Create Story Character</h3>
+            <p className="text-sm text-gray-500">Let AI create an animated character for your story</p>
           </div>
           
           <Button 
             onClick={onGenerate}
             className="mt-6 bg-gradient-to-r from-kids-blue to-kids-purple hover:opacity-90 text-white"
           >
-            Generate Image
+            Generate Character
           </Button>
         </div>
       )}
@@ -54,8 +54,8 @@ export function ImageGeneration({
           <div className="animate-bounce-gentle">
             <div className="w-16 h-16 border-4 border-kids-purple border-t-transparent rounded-full animate-spin mx-auto"></div>
           </div>
-          <p className="mt-6 text-center text-kids-purple font-medium">Creating your illustration...</p>
-          <p className="text-sm text-gray-500 mt-2 text-center">Our AI is drawing something special!</p>
+          <p className="mt-6 text-center text-kids-purple font-medium">Creating your story character...</p>
+          <p className="text-sm text-gray-500 mt-2 text-center">Our AI is drawing an animated character for your tale!</p>
         </div>
       )}
       
@@ -63,7 +63,7 @@ export function ImageGeneration({
         <div className="w-full relative">
           <img 
             src={imageUrl} 
-            alt="Story illustration" 
+            alt="Story character illustration" 
             className={cn(
               "w-full h-auto rounded-xl object-cover aspect-square",
               "shadow-lg transition-all duration-500",
@@ -75,7 +75,7 @@ export function ImageGeneration({
               size="sm"
               className="bg-kids-orange hover:bg-kids-orange/90 text-white"
             >
-              Regenerate
+              New Character
             </Button>
           </div>
         </div>
