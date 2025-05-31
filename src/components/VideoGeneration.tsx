@@ -43,23 +43,15 @@ export function VideoGeneration({
       }, 500);
 
       // In a real implementation, this would call video generation API
-      // For now, we'll simulate a delay and return a mock video URL
+      // For now, we'll simulate a delay and return a working video URL
       await new Promise(resolve => setTimeout(resolve, 5000));
       
       clearInterval(progressInterval);
       setProgress(100);
       
-      // Use a placeholder video based on the theme
-      const placeholderVideos: Record<string, string> = {
-        adventure: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
-        fantasy: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4",
-        mystery: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
-        friendship: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4",
-        animals: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4",
-        space: "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4",
-      };
+      // Use Big Buck Bunny as a working test video
+      setVideoUrl("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4");
       
-      setVideoUrl(placeholderVideos[theme] || placeholderVideos.adventure);
     } catch (error) {
       console.error("Error generating video:", error);
     } finally {
@@ -73,10 +65,22 @@ export function VideoGeneration({
       if (isPlaying) {
         video.pause();
       } else {
-        video.play();
+        video.play().catch(console.error);
       }
       setIsPlaying(!isPlaying);
     }
+  };
+
+  const handleVideoPlay = () => {
+    setIsPlaying(true);
+  };
+
+  const handleVideoPause = () => {
+    setIsPlaying(false);
+  };
+
+  const handleVideoEnded = () => {
+    setIsPlaying(false);
   };
 
   const handleDownload = () => {
@@ -84,6 +88,7 @@ export function VideoGeneration({
       const link = document.createElement('a');
       link.href = videoUrl;
       link.download = 'story-animation.mp4';
+      link.target = '_blank';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -149,19 +154,19 @@ export function VideoGeneration({
       
       {videoUrl && (
         <div className="w-full relative">
-          <div className="rounded-xl overflow-hidden shadow-lg">
+          <div className="rounded-xl overflow-hidden shadow-lg bg-black">
             <video 
               id="story-video"
               src={videoUrl} 
-              className="w-full h-auto aspect-video object-cover"
-              controls={false}
-              onPlay={() => setIsPlaying(true)}
-              onPause={() => setIsPlaying(false)}
-              onEnded={() => setIsPlaying(false)}
+              className="w-full h-auto aspect-video object-contain"
+              onPlay={handleVideoPlay}
+              onPause={handleVideoPause}
+              onEnded={handleVideoEnded}
+              preload="metadata"
             />
             
             {/* Custom video controls overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
               <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
                 <Button
                   onClick={togglePlayPause}
@@ -190,6 +195,16 @@ export function VideoGeneration({
                   </Button>
                 </div>
               </div>
+              
+              {!isPlaying && (
+                <Button
+                  onClick={togglePlayPause}
+                  size="lg"
+                  className="bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm rounded-full w-16 h-16"
+                >
+                  <Play className="w-8 h-8 ml-1" />
+                </Button>
+              )}
             </div>
           </div>
           

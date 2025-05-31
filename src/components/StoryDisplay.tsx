@@ -45,20 +45,33 @@ export function StoryDisplay({
     
     try {
       // In a real implementation, this would call the Replicate API
-      // For now, we'll simulate a delay and return a mock image URL
+      // For now, we'll simulate a delay and return a story-related image URL
       await new Promise(resolve => setTimeout(resolve, 3000));
       
-      // Use a placeholder image based on the theme
-      const placeholderImages: Record<string, string> = {
-        adventure: "https://images.unsplash.com/photo-1472396961693-142e6e269027",
-        fantasy: "https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b",
-        mystery: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
-        friendship: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
-        animals: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1",
-        space: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
-      };
+      // Generate more story-related images based on theme and story content
+      const storyKeywords = storyText.toLowerCase();
+      let selectedImage = "";
       
-      setImageUrl(placeholderImages[theme] || placeholderImages.adventure);
+      // Choose images based on story content and theme
+      if (theme === 'adventure' || storyKeywords.includes('mountain') || storyKeywords.includes('forest')) {
+        selectedImage = "https://images.unsplash.com/photo-1472396961693-142e6e269027?w=800&h=600&fit=crop"; // mountains and deer
+      } else if (theme === 'fantasy' || storyKeywords.includes('magic') || storyKeywords.includes('castle')) {
+        selectedImage = "https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?w=800&h=600&fit=crop"; // fantasy castle
+      } else if (theme === 'mystery' || storyKeywords.includes('dark') || storyKeywords.includes('night')) {
+        selectedImage = "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&h=600&fit=crop"; // matrix/mystery
+      } else if (theme === 'friendship' || storyKeywords.includes('friend') || storyKeywords.includes('together')) {
+        selectedImage = "https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=800&h=600&fit=crop"; // friendly cat
+      } else if (theme === 'animals' || storyKeywords.includes('animal') || storyKeywords.includes('cat') || storyKeywords.includes('dog')) {
+        selectedImage = "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?w=800&h=600&fit=crop"; // cute animals
+      } else if (theme === 'space' || storyKeywords.includes('space') || storyKeywords.includes('star') || storyKeywords.includes('planet')) {
+        selectedImage = "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&h=600&fit=crop"; // space
+      } else {
+        // Default to adventure theme
+        selectedImage = "https://images.unsplash.com/photo-1472396961693-142e6e269027?w=800&h=600&fit=crop";
+      }
+      
+      console.log(`Generated image for theme: ${theme}, story contains: ${storyKeywords.slice(0, 50)}...`);
+      setImageUrl(selectedImage);
     } catch (error) {
       console.error("Error generating image:", error);
     } finally {
