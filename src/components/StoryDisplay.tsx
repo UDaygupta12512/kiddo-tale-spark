@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { ImageGeneration } from './ImageGeneration';
+import { VideoGeneration } from './VideoGeneration';
 import { cn } from "@/lib/utils";
 
 type StoryDisplayProps = {
@@ -19,6 +20,7 @@ export function StoryDisplay({
 }: StoryDisplayProps) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [animateIn, setAnimateIn] = useState(false);
+  const [isGeneratingVideo, setIsGeneratingVideo] = useState(false);
   
   useEffect(() => {
     // Add a slight delay before animating in the content
@@ -68,12 +70,12 @@ export function StoryDisplay({
   
   return (
     <div className={cn(
-      "story-card w-full max-w-4xl mx-auto mt-8 transition-all duration-700 opacity-0 translate-y-10",
+      "story-card w-full max-w-6xl mx-auto mt-8 transition-all duration-700 opacity-0 translate-y-10",
       animateIn && "opacity-100 translate-y-0"
     )}>
       <h2 className="text-2xl font-bold mb-2 text-center text-kids-purple">Your Story</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="prose max-w-none">
           {formatStory(storyText)}
           
@@ -98,12 +100,20 @@ export function StoryDisplay({
           </div>
         </div>
         
-        <div className="flex flex-col items-center justify-start">
+        <div className="flex flex-col space-y-6">
           <ImageGeneration 
             imageUrl={imageUrl}
             isGenerating={isGeneratingImage}
             onGenerate={handleGenerateImage}
             theme={theme}
+          />
+          
+          <VideoGeneration
+            storyText={storyText}
+            imageUrl={imageUrl}
+            theme={theme}
+            isGenerating={isGeneratingVideo}
+            setIsGenerating={setIsGeneratingVideo}
           />
         </div>
       </div>

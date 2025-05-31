@@ -72,7 +72,7 @@ const Index = () => {
             
             <p className="text-xl md:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto">
               Design unique stories with your child's favorite characters
-              and watch their imagination come to life with AI illustrations.
+              and watch their imagination come to life with AI illustrations and animations.
             </p>
             
             <a 
