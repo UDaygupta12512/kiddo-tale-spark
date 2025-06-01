@@ -1,6 +1,7 @@
 
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { BackButton } from "@/components/BackButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
@@ -60,8 +61,10 @@ const ParentsTeachers = () => {
     <div className="min-h-screen w-full">
       <Header />
       
-      <main className="py-16 px-4">
+      <main className="py-16 px-4 animate-fade-in">
         <div className="max-w-6xl mx-auto space-y-12">
+          <BackButton />
+          
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
               👨‍👩‍👧‍👦 Parents' & Teachers' Corner
@@ -73,7 +76,7 @@ const ParentsTeachers = () => {
           </div>
 
           {/* Educational Benefits */}
-          <section>
+          <section className="animate-fade-in">
             <h2 className="text-3xl font-bold text-kids-purple mb-8 flex items-center gap-3">
               <BookOpen />
               Educational Benefits of Storytelling
@@ -81,7 +84,7 @@ const ParentsTeachers = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {educationalBenefits.map((benefit, index) => (
-                <Card key={index} className="hover:shadow-lg transition-shadow">
+                <Card key={index} className="hover:shadow-lg transition-all duration-300 hover:scale-105">
                   <CardHeader>
                     <CardTitle className="text-kids-blue flex items-center gap-3">
                       <span className="text-2xl">{benefit.icon}</span>
@@ -97,20 +100,20 @@ const ParentsTeachers = () => {
           </section>
 
           {/* Writing Prompts */}
-          <section>
+          <section className="animate-fade-in">
             <h2 className="text-3xl font-bold text-kids-orange mb-8 flex items-center gap-3">
               <Lightbulb />
               Creative Writing Prompts for Classrooms
             </h2>
             
-            <Card>
+            <Card className="transition-all duration-300 hover:shadow-lg">
               <CardHeader>
                 <CardTitle className="text-kids-orange">Spark Creativity with These Prompts</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {writingPrompts.map((prompt, index) => (
-                    <div key={index} className="p-4 bg-kids-yellow/20 rounded-lg border-l-4 border-kids-orange">
+                    <div key={index} className="p-4 bg-kids-yellow/20 rounded-lg border-l-4 border-kids-orange transition-all duration-200 hover:bg-kids-yellow/30">
                       <p className="text-gray-700">{prompt}</p>
                     </div>
                   ))}
@@ -131,14 +134,14 @@ const ParentsTeachers = () => {
           </section>
 
           {/* Printable Templates */}
-          <section>
+          <section className="animate-fade-in">
             <h2 className="text-3xl font-bold text-kids-green mb-8 flex items-center gap-3">
               <Download />
               Printable Story Templates for Offline Use
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Card>
+              <Card className="transition-all duration-300 hover:shadow-lg hover:scale-105">
                 <CardHeader>
                   <CardTitle className="text-kids-green">Story Planning Template</CardTitle>
                 </CardHeader>
@@ -146,7 +149,7 @@ const ParentsTeachers = () => {
                   <p className="text-gray-600">Help children organize their thoughts with character, setting, and plot planning sheets.</p>
                   <Button 
                     onClick={() => downloadTemplate("Story Planning")}
-                    className="w-full bg-kids-green hover:bg-kids-green/90"
+                    className="w-full bg-kids-green hover:bg-kids-green/90 transition-all duration-200"
                   >
                     <Download size={16} className="mr-2" />
                     Download PDF
@@ -154,7 +157,7 @@ const ParentsTeachers = () => {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="transition-all duration-300 hover:shadow-lg hover:scale-105">
                 <CardHeader>
                   <CardTitle className="text-kids-green">Comic Strip Template</CardTitle>
                 </CardHeader>
@@ -162,7 +165,7 @@ const ParentsTeachers = () => {
                   <p className="text-gray-600">Visual storytelling templates with panels for drawing and writing short stories.</p>
                   <Button 
                     onClick={() => downloadTemplate("Comic Strip")}
-                    className="w-full bg-kids-green hover:bg-kids-green/90"
+                    className="w-full bg-kids-green hover:bg-kids-green/90 transition-all duration-200"
                   >
                     <Download size={16} className="mr-2" />
                     Download PDF
@@ -170,7 +173,7 @@ const ParentsTeachers = () => {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="transition-all duration-300 hover:shadow-lg hover:scale-105">
                 <CardHeader>
                   <CardTitle className="text-kids-green">Story Journal Pages</CardTitle>
                 </CardHeader>
@@ -178,7 +181,7 @@ const ParentsTeachers = () => {
                   <p className="text-gray-600">Daily writing pages with prompts and reflection questions for ongoing practice.</p>
                   <Button 
                     onClick={() => downloadTemplate("Story Journal")}
-                    className="w-full bg-kids-green hover:bg-kids-green/90"
+                    className="w-full bg-kids-green hover:bg-kids-green/90 transition-all duration-200"
                   >
                     <Download size={16} className="mr-2" />
                     Download PDF
@@ -189,7 +192,7 @@ const ParentsTeachers = () => {
           </section>
 
           {/* FAQ for Educators */}
-          <section>
+          <section className="animate-fade-in">
             <h2 className="text-3xl font-bold text-kids-purple mb-8 flex items-center gap-3">
               <Users />
               Frequently Asked Questions

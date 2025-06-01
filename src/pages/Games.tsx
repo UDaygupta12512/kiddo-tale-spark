@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { BackButton } from "@/components/BackButton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StoryQuiz } from "@/components/StoryQuiz";
 import { FinishTheStory } from "@/components/FinishTheStory";
@@ -15,8 +16,10 @@ const Games = () => {
     <div className="min-h-screen w-full">
       <Header />
       
-      <main className="py-16 px-4">
+      <main className="py-16 px-4 animate-fade-in">
         <div className="max-w-6xl mx-auto">
+          <BackButton />
+          
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
               🎮 Mini Games & Activities
@@ -29,26 +32,26 @@ const Games = () => {
 
           <Tabs defaultValue="quiz" className="w-full">
             <TabsList className="grid w-full grid-cols-3 mb-8">
-              <TabsTrigger value="quiz" className="text-kids-purple data-[state=active]:bg-kids-purple data-[state=active]:text-white">
+              <TabsTrigger value="quiz" className="text-kids-purple data-[state=active]:bg-kids-purple data-[state=active]:text-white transition-all duration-200">
                 📝 Story Quiz
               </TabsTrigger>
-              <TabsTrigger value="finish" className="text-kids-blue data-[state=active]:bg-kids-blue data-[state=active]:text-white">
+              <TabsTrigger value="finish" className="text-kids-blue data-[state=active]:bg-kids-blue data-[state=active]:text-white transition-all duration-200">
                 ✍️ Finish the Story
               </TabsTrigger>
-              <TabsTrigger value="coloring" className="text-kids-orange data-[state=active]:bg-kids-orange data-[state=active]:text-white">
+              <TabsTrigger value="coloring" className="text-kids-orange data-[state=active]:bg-kids-orange data-[state=active]:text-white transition-all duration-200">
                 🎨 Coloring Pages
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="quiz" className="mt-6">
+            <TabsContent value="quiz" className="mt-6 animate-fade-in">
               <StoryQuiz storyText={sampleStory} />
             </TabsContent>
 
-            <TabsContent value="finish" className="mt-6">
+            <TabsContent value="finish" className="mt-6 animate-fade-in">
               <FinishTheStory storyText={sampleStory} />
             </TabsContent>
 
-            <TabsContent value="coloring" className="mt-6">
+            <TabsContent value="coloring" className="mt-6 animate-fade-in">
               <ColoringPages />
             </TabsContent>
           </Tabs>
