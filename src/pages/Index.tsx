@@ -1,10 +1,13 @@
+
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { StoryForm } from "@/components/StoryForm";
 import { StoryDisplay } from "@/components/StoryDisplay";
 import { Features } from "@/components/Features";
 import { HowItWorks } from "@/components/HowItWorks";
 import { Footer } from "@/components/Footer";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const [storyText, setStoryText] = useState("");
@@ -73,12 +76,32 @@ const Index = () => {
               and watch their imagination come to life with AI illustrations and animations.
             </p>
             
-            <a 
-              href="#create" 
-              className="inline-block bg-gradient-to-r from-kids-purple to-kids-blue hover:opacity-90 transition-opacity text-white font-bold py-4 px-8 rounded-xl text-lg shadow-lg shadow-kids-purple/30"
-            >
-              Start Creating
-            </a>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+              <a 
+                href="#create" 
+                className="inline-block bg-gradient-to-r from-kids-purple to-kids-blue hover:opacity-90 transition-opacity text-white font-bold py-4 px-8 rounded-xl text-lg shadow-lg shadow-kids-purple/30"
+              >
+                Start Creating
+              </a>
+              
+              <Link to="/games">
+                <Button 
+                  variant="outline" 
+                  className="border-kids-orange text-kids-orange hover:bg-kids-orange/10 py-4 px-8 text-lg"
+                >
+                  🎮 Play Games
+                </Button>
+              </Link>
+              
+              <Link to="/parents-teachers">
+                <Button 
+                  variant="outline" 
+                  className="border-kids-green text-kids-green hover:bg-kids-green/10 py-4 px-8 text-lg"
+                >
+                  👨‍👩‍👧‍👦 For Educators
+                </Button>
+              </Link>
+            </div>
           </div>
         </section>
         
