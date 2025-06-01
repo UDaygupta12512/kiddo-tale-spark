@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -15,7 +14,6 @@ type VideoGenerationProps = {
 
 export function VideoGeneration({ 
   storyText, 
-  imageUrl, 
   theme, 
   isGenerating, 
   setIsGenerating 
@@ -118,16 +116,9 @@ export function VideoGeneration({
           <Button 
             onClick={handleGenerateVideo}
             className="mt-6 bg-gradient-to-r from-kids-blue to-kids-purple hover:opacity-90 text-white"
-            disabled={!imageUrl}
           >
-            {!imageUrl ? "Generate Image First" : "Create Video Animation"}
+            Create Video Animation
           </Button>
-          
-          {!imageUrl && (
-            <p className="text-xs text-gray-400 mt-2">
-              An image is required to create the video animation
-            </p>
-          )}
         </div>
       )}
       

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { StoryForm } from "@/components/StoryForm";
@@ -11,7 +10,6 @@ const Index = () => {
   const [storyText, setStoryText] = useState("");
   const [storyTheme, setStoryTheme] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
   const handleStoryGenerated = (text: string, theme: string) => {
     setStoryText(text);
@@ -103,8 +101,6 @@ const Index = () => {
             <StoryDisplay 
               storyText={storyText} 
               theme={storyTheme}
-              isGeneratingImage={isGeneratingImage}
-              setIsGeneratingImage={setIsGeneratingImage}
             />
           )}
         </section>
