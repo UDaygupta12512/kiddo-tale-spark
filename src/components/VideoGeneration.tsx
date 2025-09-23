@@ -72,7 +72,7 @@ export function VideoGeneration({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
+          'x-goog-api-key': apiKey,
         },
         body: JSON.stringify({
           contents: [{
