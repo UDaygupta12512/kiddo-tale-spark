@@ -67,17 +67,23 @@ export function VideoGeneration({
 
       setProgress(30);
 
-      // Call Gemini Veo 3 API using the correct endpoint
-      const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/veo-3.0-generate-001:predictLongRunning', {
+      // Call Gemini Veo 3 API
+      const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/veo-003:generateContent', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-goog-api-key': apiKey,
+          'Authorization': `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          instances: [{
-            prompt: videoPrompt
-          }]
+          contents: [{
+            parts: [{
+              text: videoPrompt
+            }]
+          }],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 2048,
+          }
         })
       });
 
@@ -89,49 +95,17 @@ export function VideoGeneration({
       }
 
       const data = await response.json();
-      const operationName = data.name;
-      
-      if (!operationName) {
-        throw new Error('No operation name received from API');
-      }
+      setProgress(80);
 
-      setProgress(50);
+      // Extract video URL from response
+      const videoUrl = data.candidates?.[0]?.content?.parts?.[0]?.videoUrl;
       
-      // Poll for completion
-      let isComplete = false;
-      let finalResponse;
-      
-      while (!isComplete) {
-        const statusResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/${operationName}`, {
-          headers: {
-            'x-goog-api-key': apiKey,
-          }
-        });
-        
-        if (!statusResponse.ok) {
-          throw new Error('Failed to check video generation status');
-        }
-        
-        finalResponse = await statusResponse.json();
-        isComplete = finalResponse.done;
-        
-        if (!isComplete) {
-          setProgress(prev => Math.min(prev + 5, 90));
-          await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
-        }
-      }
-
-      setProgress(95);
-
-      // Extract video URL from the final response
-      const videoUri = finalResponse.response?.generateVideoResponse?.generatedSamples?.[0]?.video?.uri;
-      
-      if (!videoUri) {
-        throw new Error('No video URI received from API');
+      if (!videoUrl) {
+        throw new Error('No video URL received from API');
       }
 
       setProgress(100);
-      setVideoUrl(videoUri);
+      setVideoUrl(videoUrl);
       toast.success("Video generated successfully!");
       
     } catch (error) {
