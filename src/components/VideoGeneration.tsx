@@ -67,45 +67,72 @@ export function VideoGeneration({
 
       setProgress(30);
 
-      console.log('Starting video generation with prompt:', videoPrompt);
-      
-      // Add timestamp to make each video unique
-      const uniquePrompt = `${videoPrompt} - Generated at ${new Date().toISOString()}. Make this video unique and different from previous generations.`;
-      
-      // Note: Gemini Veo 3 API is currently in limited preview
-      // For testing purposes, we'll simulate the API call
-      console.log('API Key present:', !!apiKey);
-      
+      // Call Gemini Veo 3 API using the correct endpoint
+      const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/veo-3.0-generate-001:predictLongRunning', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey,
+        },
+        body: JSON.stringify({
+          instances: [{
+            prompt: videoPrompt
+          }]
+        })
+      });
+
       setProgress(60);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Failed to generate video');
+      }
+
+      const data = await response.json();
+      const operationName = data.name;
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setProgress(80);
+      if (!operationName) {
+        throw new Error('No operation name received from API');
+      }
+
+      setProgress(50);
       
-      // For now, provide different demo videos based on theme/content
-      const demoVideos = [
-        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
-      ];
+      // Poll for completion
+      let isComplete = false;
+      let finalResponse;
       
-      // Select video based on story content hash for consistency
-      const hash = storyText.split('').reduce((a, b) => {
-        a = ((a << 5) - a) + b.charCodeAt(0);
-        return a & a;
-      }, 0);
+      while (!isComplete) {
+        const statusResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/${operationName}`, {
+          headers: {
+            'x-goog-api-key': apiKey,
+          }
+        });
+        
+        if (!statusResponse.ok) {
+          throw new Error('Failed to check video generation status');
+        }
+        
+        finalResponse = await statusResponse.json();
+        isComplete = finalResponse.done;
+        
+        if (!isComplete) {
+          setProgress(prev => Math.min(prev + 5, 90));
+          await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
+        }
+      }
+
+      setProgress(95);
+
+      // Extract video URL from the final response
+      const videoUri = finalResponse.response?.generateVideoResponse?.generatedSamples?.[0]?.video?.uri;
       
-      const videoIndex = Math.abs(hash) % demoVideos.length;
-      const selectedVideo = demoVideos[videoIndex];
-      
-      console.log('Selected demo video index:', videoIndex);
-      
+      if (!videoUri) {
+        throw new Error('No video URI received from API');
+      }
+
       setProgress(100);
-      setVideoUrl(selectedVideo);
-      
-      toast.success("Demo video generated! Connect to Supabase for real AI video generation.");
+      setVideoUrl(videoUri);
+      toast.success("Video generated successfully!");
       
     } catch (error) {
       console.error("Error generating video:", error);
