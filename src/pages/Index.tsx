@@ -84,6 +84,15 @@ const Index = () => {
                 Start Creating
               </a>
               
+              <Link to="/creative">
+                <Button 
+                  variant="outline" 
+                  className="border-kids-purple text-kids-purple hover:bg-kids-purple/10 py-4 px-8 text-lg"
+                >
+                  ✨ Creative Studio
+                </Button>
+              </Link>
+              
               <Link to="/games">
                 <Button 
                   variant="outline" 
