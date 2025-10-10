@@ -21,13 +21,48 @@ export function VideoGeneration({
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const fallbackVideoUrl = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
 
   const handleGenerateVideo = async () => {
     if (!storyText) return;
-    
+
     setIsGenerating(true);
     setProgress(0);
-    
+
+    // Curated public sample videos (CORS-friendly) mapped with simple tags
+    const videoCatalog = [
+      { url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", tags: ["forest","animals","nature","funny","bunny"] },
+      { url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4", tags: ["city","dream","surreal","friends"] },
+      { url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4", tags: ["city","robots","action","sci-fi"] },
+      { url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4", tags: ["fun","adventure","car"] },
+      { url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4", tags: ["action","city","chaos"] },
+      { url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4", tags: ["escape","adventure","fast"] },
+      { url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4", tags: ["fire","action"] },
+      { url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4", tags: ["fun","colorful"] },
+      { url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4", tags: ["car","outdoor","adventure"] },
+      { url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4", tags: ["car","review"] },
+      { url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4", tags: ["talk","adventure"] }
+    ];
+
+    const text = (storyText + " " + (theme || "")).toLowerCase();
+    const words = (text.match(/[a-zA-Z]+/g) || []) as string[];
+
+    const scoreVideo = (tags: string[]) => tags.reduce((acc, t) => acc + (words.includes(t) ? 1 : 0), 0);
+    const withScores = videoCatalog.map(v => ({ ...v, score: scoreVideo(v.tags) }));
+
+    // Prefer videos matching story/theme; if none match, use full catalog
+    const maxScore = Math.max(...withScores.map(v => v.score));
+    const pool = maxScore > 0 ? withScores.filter(v => v.score === maxScore) : withScores;
+
+    // Seeded randomness so each generation changes, but still influenced by story/theme
+    const hashString = (s: string) => {
+      let h = 0;
+      for (let i = 0; i < s.length; i++) { h = (h << 5) - h + s.charCodeAt(i); h |= 0; }
+      return Math.abs(h);
+    };
+    const seed = hashString(text + "|" + Date.now().toString());
+    const idx = seed % pool.length;
+
     try {
       // Simulate video generation progress
       const progressInterval = setInterval(() => {
@@ -40,18 +75,15 @@ export function VideoGeneration({
         });
       }, 500);
 
-      // In a real implementation, this would call video generation API
-      // For now, we'll simulate a delay and return a working video URL
-      await new Promise(resolve => setTimeout(resolve, 5000));
-      
+      // Simulate processing delay; pick a dynamic video based on pool + seed
+      await new Promise(resolve => setTimeout(resolve, 3000));
+
       clearInterval(progressInterval);
       setProgress(100);
-      
-      // Use Big Buck Bunny as a working test video
-      setVideoUrl("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4");
-      
+      setVideoUrl(pool[idx].url || fallbackVideoUrl);
     } catch (error) {
       console.error("Error generating video:", error);
+      setVideoUrl(fallbackVideoUrl);
     } finally {
       setIsGenerating(false);
     }
@@ -153,6 +185,7 @@ export function VideoGeneration({
               onPlay={handleVideoPlay}
               onPause={handleVideoPause}
               onEnded={handleVideoEnded}
+              onError={() => setVideoUrl(fallbackVideoUrl)}
               preload="metadata"
             />
             
