@@ -12,119 +12,79 @@ serve(async (req) => {
 
   try {
     const { storyText, theme } = await req.json();
-    
-    if (!storyText) {
-      return new Response(
-        JSON.stringify({ error: 'Story text is required' }), 
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 400 
-        }
-      );
-    }
-
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    console.log('Generating video description for story:', storyText.substring(0, 100));
+    console.log('Generating video scene for story:', storyText.substring(0, 100));
 
-    // First, use AI to create a detailed video prompt based on the story
-    const promptResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    // Generate AI image based on story using Lovable AI
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'google/gemini-2.5-flash-image-preview',
         messages: [
           {
-            role: 'system',
-            content: 'You are a creative video description generator. Create detailed, vivid descriptions for story animations that are child-friendly and engaging. Focus on visual elements, colors, movements, and atmosphere.'
-          },
-          {
             role: 'user',
-            content: `Create a detailed video scene description for this children's story (theme: ${theme || 'adventure'}): ${storyText.substring(0, 500)}`
+            content: `Create a colorful, animated, child-friendly video scene for this story (theme: ${theme}): ${storyText}. Make it vibrant and magical for children aged 3-12. Style: cartoon animation, bright colors, whimsical, fun.`
           }
         ],
+        modalities: ['image', 'text']
       }),
     });
 
-    if (!promptResponse.ok) {
-      console.error('AI prompt generation failed:', await promptResponse.text());
-      throw new Error('Failed to generate video description');
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('AI gateway error:', response.status, errorText);
+      
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ error: 'AI credits exhausted. Please add credits to continue.' }),
+          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      throw new Error('Failed to generate video content');
     }
 
-    const promptData = await promptResponse.json();
-    const videoDescription = promptData.choices[0].message.content;
-    
-    console.log('Generated video description:', videoDescription);
+    const data = await response.json();
+    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
 
-    // For now, return a simulated video URL based on the story
-    // In production, this would call a real video generation API
-    const simulatedVideoUrl = getVideoForStory(storyText, theme);
+    if (!imageUrl) {
+      throw new Error('No image generated');
+    }
+
+    console.log('Video scene generated successfully');
 
     return new Response(
       JSON.stringify({ 
-        videoUrl: simulatedVideoUrl,
-        description: videoDescription,
-        message: 'Video generated successfully'
-      }), 
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        videoUrl: imageUrl,
+        message: 'Story animation generated successfully!'
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
       }
     );
-
   } catch (error) {
     console.error('Error in generate-video function:', error);
     return new Response(
-      JSON.stringify({ error: error.message }), 
-      { 
+      JSON.stringify({ error: error.message }),
+      {
+        status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500 
       }
     );
   }
 });
-
-function getVideoForStory(storyText: string, theme: string): string {
-  const videoCatalog = [
-    { url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", keywords: ["forest", "animals", "nature", "bunny", "adventure", "cute", "woodland"] },
-    { url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4", keywords: ["dream", "surreal", "fantasy", "imagination", "city", "strange"] },
-    { url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4", keywords: ["city", "robots", "action", "sci-fi", "future", "technology"] },
-    { url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4", keywords: ["fun", "adventure", "car", "ride", "excitement", "speed"] },
-    { url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4", keywords: ["action", "city", "chaos", "explosion", "dramatic"] },
-    { url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4", keywords: ["escape", "adventure", "fast", "chase", "exciting"] },
-    { url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4", keywords: ["fire", "action", "intense", "dramatic", "danger"] },
-    { url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4", keywords: ["fun", "colorful", "happy", "joyful", "celebration"] },
-    { url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4", keywords: ["car", "outdoor", "adventure", "nature", "travel"] },
-    { url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4", keywords: ["car", "review", "vehicle", "journey"] },
-    { url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4", keywords: ["talk", "adventure", "journey", "trip", "road"] }
-  ];
-
-  const text = `${storyText} ${theme || ''}`.toLowerCase();
-  
-  // Score each video based on keyword matches
-  const scoredVideos = videoCatalog.map(video => {
-    let score = 0;
-    video.keywords.forEach(keyword => {
-      if (text.includes(keyword)) {
-        score += 10;
-      }
-    });
-    
-    // Add randomness based on story content to ensure variety
-    const hash = text.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    score += hash % 5;
-    
-    return { ...video, score };
-  });
-
-  // Sort by score and pick the best match
-  scoredVideos.sort((a, b) => b.score - a.score);
-  
-  // Return the highest scoring video
-  return scoredVideos[0].url;
-}

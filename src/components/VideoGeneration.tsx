@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { Video, Download, Play, Pause } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 type VideoGenerationProps = {
   storyText: string;
@@ -19,6 +20,7 @@ export function VideoGeneration({
   isGenerating, 
   setIsGenerating 
 }: VideoGenerationProps) {
+  const { toast } = useToast();
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -31,7 +33,7 @@ export function VideoGeneration({
     setProgress(0);
 
     try {
-      // Simulate video generation progress
+      // Progress animation
       const progressInterval = setInterval(() => {
         setProgress(prev => {
           if (prev >= 90) {
@@ -42,8 +44,9 @@ export function VideoGeneration({
         });
       }, 500);
 
-      console.log('Calling generate-video edge function...');
-      
+      console.log('Calling AI video generation...');
+
+      // Call edge function to generate AI-powered video scene
       const { data, error } = await supabase.functions.invoke('generate-video', {
         body: { 
           storyText: storyText.substring(0, 1000),
@@ -55,18 +58,44 @@ export function VideoGeneration({
 
       if (error) {
         console.error('Edge function error:', error);
-        throw error;
-      }
-
-      if (data?.videoUrl) {
+        if (error.message?.includes('429')) {
+          toast({
+            title: 'Rate Limit',
+            description: 'Too many requests. Please try again in a moment.',
+            variant: 'destructive',
+          });
+        } else if (error.message?.includes('402')) {
+          toast({
+            title: 'Credits Exhausted',
+            description: 'Please add AI credits to continue.',
+            variant: 'destructive',
+          });
+        } else {
+          toast({
+            title: 'Error',
+            description: 'Failed to generate video. Using default.',
+            variant: 'destructive',
+          });
+        }
+        setVideoUrl(fallbackVideoUrl);
+      } else if (data?.videoUrl) {
         setProgress(100);
         setVideoUrl(data.videoUrl);
-        console.log('Video generated successfully:', data.videoUrl);
+        toast({
+          title: 'Success!',
+          description: 'Your story animation has been created!',
+        });
+        console.log('Video generated:', data.videoUrl);
       } else {
-        throw new Error('No video URL returned');
+        setVideoUrl(fallbackVideoUrl);
       }
     } catch (error) {
-      console.error("Error generating video:", error);
+      console.error("Error:", error);
+      toast({
+        title: 'Error',
+        description: 'Using default video.',
+        variant: 'destructive',
+      });
       setVideoUrl(fallbackVideoUrl);
     } finally {
       setIsGenerating(false);
