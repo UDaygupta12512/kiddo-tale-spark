@@ -1,9 +1,38 @@
 
 import { cn } from "@/lib/utils";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
+import { Session } from "@supabase/supabase-js";
+import { useToast } from "@/components/ui/use-toast";
+import { User, LogOut } from "lucide-react";
 
 export function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [session, setSession] = useState<Session | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    toast({
+      title: "Signed out",
+      description: "See you next time! 👋",
+    });
+    navigate('/');
+  };
 
   return (
     <header className="w-full py-4 px-6 flex justify-between items-center">
@@ -42,6 +71,15 @@ export function Header() {
           Games
         </Link>
         <Link 
+          to="/creative" 
+          className={cn(
+            "text-lg transition-all duration-200 hover:text-kids-orange hover:scale-105",
+            location.pathname === "/creative" && "text-kids-orange font-semibold"
+          )}
+        >
+          Creative
+        </Link>
+        <Link 
           to="/parents-teachers" 
           className={cn(
             "text-lg transition-all duration-200 hover:text-kids-green hover:scale-105",
@@ -52,11 +90,30 @@ export function Header() {
         </Link>
       </div>
       
-      <Link to="/#create">
-        <button className="bg-kids-orange hover:bg-opacity-90 text-white px-4 py-2 rounded-xl font-semibold transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105">
-          Get Started
+      {session ? (
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-kids-purple/10">
+            <User className="w-4 h-4 text-kids-purple" />
+            <span className="text-sm text-kids-purple font-medium">
+              {session.user.email?.split('@')[0]}
+            </span>
+          </div>
+          <button 
+            onClick={handleSignOut}
+            className="bg-kids-red hover:bg-opacity-90 text-white px-4 py-2 rounded-xl font-semibold transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105 flex items-center gap-2"
+          >
+            <LogOut className="w-4 h-4" />
+            Sign Out
+          </button>
+        </div>
+      ) : (
+        <button 
+          onClick={() => navigate('/auth')}
+          className="bg-kids-orange hover:bg-opacity-90 text-white px-4 py-2 rounded-xl font-semibold transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105"
+        >
+          Sign In
         </button>
-      </Link>
+      )}
     </header>
   );
 }
