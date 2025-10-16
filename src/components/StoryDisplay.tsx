@@ -5,6 +5,8 @@ import { VideoGeneration } from './VideoGeneration';
 import { StoryNarrator } from './StoryNarrator';
 import { WordExplorer } from './WordExplorer';
 import { StoryRemixer } from './StoryRemixer';
+import { StoryCertificate } from './StoryCertificate';
+import { StoryPDFExport } from './StoryPDFExport';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
@@ -51,11 +53,12 @@ export function StoryDisplay({
       <h2 className="text-2xl font-bold mb-6 text-center text-kids-purple">Your Story</h2>
       
       <Tabs defaultValue="story" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-6">
+        <TabsList className="grid w-full grid-cols-5 mb-6">
           <TabsTrigger value="story">📖 Story</TabsTrigger>
           <TabsTrigger value="narrate">🎧 Narrate</TabsTrigger>
           <TabsTrigger value="explore">📚 Explore</TabsTrigger>
           <TabsTrigger value="remix">✨ Remix</TabsTrigger>
+          <TabsTrigger value="rewards">🏆 Rewards</TabsTrigger>
         </TabsList>
 
         <TabsContent value="story">
@@ -64,6 +67,12 @@ export function StoryDisplay({
               {formatStory(displayStory)}
               
               <div className="mt-6 flex flex-wrap gap-2">
+                <StoryPDFExport 
+                  title={`${theme || 'My'} Story`}
+                  content={displayStory}
+                  theme={theme}
+                />
+                
                 <Button 
                   onClick={() => window.print()} 
                   variant="outline" 
@@ -129,6 +138,12 @@ export function StoryDisplay({
               </div>
             </div>
           )}
+        </TabsContent>
+
+        <TabsContent value="rewards">
+          <StoryCertificate 
+            storyTitle={`${theme || 'My Amazing'} Story`}
+          />
         </TabsContent>
       </Tabs>
     </div>

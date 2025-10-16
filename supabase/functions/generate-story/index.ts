@@ -11,22 +11,38 @@ serve(async (req) => {
   }
 
   try {
-    const { mainCharacter, setting, theme, details } = await req.json();
+    const { mainCharacter, setting, theme, details, tone = 'adventurous', moralFocus = 50 } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) throw new Error('LOVABLE_API_KEY is not configured');
+
+    const toneGuide = {
+      funny: 'humorous and playful, with silly moments and wordplay',
+      adventurous: 'exciting and action-packed, with thrilling moments',
+      mystery: 'intriguing and suspenseful, with clues and discoveries',
+      heartwarming: 'gentle and touching, with emotional warmth',
+      educational: 'informative and engaging, teaching new concepts naturally'
+    };
+
+    const moralGuidance = moralFocus < 30 
+      ? 'Weave the moral subtly through the story without explicitly stating it.'
+      : moralFocus >= 70 
+      ? 'Make the moral lesson prominent and clearly stated at the end.'
+      : 'Include a clear but gentle moral that emerges naturally from the story.';
 
     const prompt = `Write a delightful children's story (400-700 words) for ages 4-10.
 - Main character: ${mainCharacter}
 - Setting: ${setting}
 - Theme: ${theme}
 - Extra details: ${details || 'N/A'}
+- Tone: ${toneGuide[tone as keyof typeof toneGuide] || toneGuide.adventurous}
+- Moral guidance: ${moralGuidance}
 
 Requirements:
-- Friendly, imaginative, and positive tone
+- Use a ${tone} tone throughout the story
 - Clear beginning, middle, and end with gentle conflict and resolution
 - Simple vocabulary suited for kids
 - Add light dialogue and sensory details
-- Conclude with a short, kid-friendly moral on the last line starting with "Moral:"`;
+- ${moralFocus >= 30 ? 'Conclude with a short, kid-friendly moral on the last line starting with "Moral:"' : 'Let the moral emerge naturally from the story events'}`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',

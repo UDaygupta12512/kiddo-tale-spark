@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,6 +26,8 @@ export function StoryForm({ onStoryGenerated, isGenerating, setIsGenerating }: S
   const [setting, setSetting] = useState("");
   const [theme, setTheme] = useState("adventure");
   const [additionalDetails, setAdditionalDetails] = useState("");
+  const [storyTone, setStoryTone] = useState('adventurous');
+  const [moralStrength, setMoralStrength] = useState([50]);
 
   const storyThemes = [
     { value: "adventure", label: "Adventure" },
@@ -49,7 +52,9 @@ export function StoryForm({ onStoryGenerated, isGenerating, setIsGenerating }: S
           mainCharacter,
           setting,
           theme,
-          details: additionalDetails
+          details: additionalDetails,
+          tone: storyTone,
+          moralFocus: moralStrength[0]
         }
       });
 
@@ -122,6 +127,42 @@ export function StoryForm({ onStoryGenerated, isGenerating, setIsGenerating }: S
               ))}
             </SelectContent>
           </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="tone" className="text-lg">Story Tone</Label>
+          <Select value={storyTone} onValueChange={setStoryTone}>
+            <SelectTrigger id="tone" className="rounded-xl border-kids-purple/30 focus-visible:ring-kids-purple">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="funny">😄 Funny & Lighthearted</SelectItem>
+              <SelectItem value="adventurous">🗺️ Adventurous & Exciting</SelectItem>
+              <SelectItem value="mystery">🔍 Mystery & Suspense</SelectItem>
+              <SelectItem value="heartwarming">💖 Heartwarming & Gentle</SelectItem>
+              <SelectItem value="educational">📚 Educational & Informative</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-3">
+          <Label className="text-lg">Moral Lesson Emphasis</Label>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-muted-foreground">Subtle</span>
+            <Slider
+              value={moralStrength}
+              onValueChange={setMoralStrength}
+              max={100}
+              step={10}
+              className="flex-1"
+            />
+            <span className="text-sm text-muted-foreground">Strong</span>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {moralStrength[0] < 30 && "Light touch - the moral will be gently woven into the story"}
+            {moralStrength[0] >= 30 && moralStrength[0] < 70 && "Balanced - clear moral without being preachy"}
+            {moralStrength[0] >= 70 && "Prominent - strong emphasis on the life lesson"}
+          </p>
         </div>
         
         <div className="space-y-2">
