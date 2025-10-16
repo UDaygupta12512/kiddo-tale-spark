@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, XCircle, Star, Sparkles, Trophy } from "lucide-react";
@@ -20,6 +20,36 @@ export function StoryQuiz({ storyText }: StoryQuizProps) {
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
   const [quizCompleted, setQuizCompleted] = useState(false);
+
+  // Helpers for randomness and uniqueness
+  const shuffle = <T,>(array: T[]): T[] => {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  };
+
+  const sample = <T,>(array: T[], n: number): T[] => {
+    const arr = [...array];
+    const res: T[] = [];
+    while (res.length < n && arr.length) {
+      const idx = Math.floor(Math.random() * arr.length);
+      res.push(arr.splice(idx, 1)[0]);
+    }
+    return res;
+  };
+
+  const unique = <T,>(array: T[]): T[] => Array.from(new Set(array));
+
+  const makeMCQ = (question: string, correct: string, distractorPool: string[]): QuizQuestion => {
+    const pool = unique(distractorPool.filter((d) => d && d !== correct));
+    const distractors = sample(pool, 3);
+    const options = shuffle([correct, ...distractors]);
+    const correctAnswer = options.indexOf(correct);
+    return { question, options, correctAnswer };
+  };
 
   // Extract key elements from the story for dynamic question generation
   const extractStoryElements = (text: string) => {
@@ -46,76 +76,63 @@ export function StoryQuiz({ storyText }: StoryQuizProps) {
   // Generate dynamic quiz questions based on story content
   const generateQuestions = (): QuizQuestion[] => {
     if (!storyText) return [];
-    
-    const elements = extractStoryElements(storyText);
-    const questions: QuizQuestion[] = [];
-    
-    // Question 1: About the main character
-    if (elements.characters.length > 0) {
-      const mainCharacter = elements.characters[0];
-      questions.push({
-        question: `Who is the main character in this story?`,
-        options: [
-          mainCharacter,
-          elements.characters[1] || "Princess Aurora",
-          "Captain Adventure",
-          "Wizard Merlin"
-        ],
-        correctAnswer: 0
-      });
-    }
-    
-    // Question 2: About the setting
-    if (elements.settings.length > 0) {
-      const setting = elements.settings[0];
-      questions.push({
-        question: `Where does the story take place?`,
-        options: [
-          `In a magical ${setting}`,
-          "In outer space",
-          "Under the ocean",
-          "In a modern city"
-        ],
-        correctAnswer: 0
-      });
-    }
-    
-    // Question 3: About the story's theme/action
-    const storyLower = storyText.toLowerCase();
-    let themeQuestion = {
-      question: "What is the main theme of this story?",
-      options: ["Adventure and discovery", "Love and friendship", "Magic and wonder", "Learning and growth"],
-      correctAnswer: 0
-    };
-    
-    if (storyLower.includes('friend') || storyLower.includes('help')) {
-      themeQuestion.correctAnswer = 1;
-    } else if (storyLower.includes('magic') || storyLower.includes('magical')) {
-      themeQuestion.correctAnswer = 2;
-    } else if (storyLower.includes('learn') || storyLower.includes('discover')) {
-      themeQuestion.correctAnswer = 3;
-    }
-    
-    questions.push(themeQuestion);
-    
-    // Question 4: Story comprehension
-    if (elements.sentences.length > 1) {
-      questions.push({
-        question: "What lesson can we learn from this story?",
-        options: [
-          "Be brave and curious",
-          "Always tell the truth",
-          "Help others in need",
-          "All of these are good lessons"
-        ],
-        correctAnswer: 3
-      });
-    }
-    
-    return questions.slice(0, 4); // Limit to 4 questions
-  };
 
-  const questions = generateQuestions();
+    const { characters, settings, themes, sentences, words } = extractStoryElements(storyText);
+
+    const genericCharacters = ['Princess Aurora', 'Captain Adventure', 'Wizard Merlin', 'Brave Knight', 'Curious Fox', 'Sunny the Dolphin'];
+    const genericSettings = ['forest', 'castle', 'village', 'mountain', 'garden', 'beach', 'space station', 'underwater city'];
+    const genericWords = ['spaceship', 'robot', 'volcano', 'pirate', 'dinosaur', 'rocket', 'treasure', 'dragon'];
+
+    const qs: QuizQuestion[] = [];
+
+    // Q1: Main character (randomized)
+    if (characters.length || genericCharacters.length) {
+      const mainCharacter = (characters.length ? sample(characters, 1)[0] : sample(genericCharacters, 1)[0]) as string;
+      const distractorPool = unique([...(characters.filter((c) => c !== mainCharacter)), ...genericCharacters]);
+      qs.push(
+        makeMCQ('Who is the main character in this story?', mainCharacter, distractorPool)
+      );
+    }
+
+    // Q2: Setting (randomized wording and options)
+    if (settings.length || genericSettings.length) {
+      const setting = (settings.length ? sample(settings, 1)[0] : sample(genericSettings, 1)[0]) as string;
+      const distractorPool = unique([...(settings.filter((s) => s !== setting)), ...genericSettings]);
+      const correctText = `In a magical ${setting}`;
+      const distractorTexts = distractorPool.map((s) => `In a magical ${s}`);
+      qs.push(
+        makeMCQ('Where does the story take place?', correctText, distractorTexts)
+      );
+    }
+
+    // Q3: Theme (randomized correct index and option order)
+    const storyLower = storyText.toLowerCase();
+    const themeOptions = ['Adventure and discovery', 'Love and friendship', 'Magic and wonder', 'Learning and growth'];
+    let correctTheme = 'Adventure and discovery';
+    if (storyLower.includes('friend') || storyLower.includes('help')) {
+      correctTheme = 'Love and friendship';
+    } else if (storyLower.includes('magic') || storyLower.includes('magical')) {
+      correctTheme = 'Magic and wonder';
+    } else if (storyLower.includes('learn') || storyLower.includes('discover')) {
+      correctTheme = 'Learning and growth';
+    }
+    qs.push(
+      makeMCQ('What is the main theme of this story?', correctTheme, themeOptions.filter((o) => o !== correctTheme))
+    );
+
+    // Q4: Comprehension (word presence)
+    const candidateWords = unique(words.filter((w) => w.length > 4));
+    const correctWord = (candidateWords.length ? sample(candidateWords, 1)[0] : 'friendship') as string;
+    const absentPool = genericWords.filter((w) => !words.includes(w));
+    qs.push(
+      makeMCQ('Which of these appears in the story?', correctWord, absentPool)
+    );
+
+    // Shuffle question order and cap to 4
+    return shuffle(qs).slice(0, 4);
+  };
+  const [nonce, setNonce] = useState(0);
+  const questions = useMemo(() => generateQuestions(), [storyText, nonce]);
 
   const handleAnswerSelect = (answerIndex: number) => {
     setSelectedAnswer(answerIndex);
@@ -145,6 +162,7 @@ export function StoryQuiz({ storyText }: StoryQuizProps) {
     setShowResult(false);
     setScore(0);
     setQuizCompleted(false);
+    setNonce((n) => n + 1); // force fresh question generation
   };
 
   if (!storyText) {
@@ -221,11 +239,22 @@ export function StoryQuiz({ storyText }: StoryQuizProps) {
   return (
     <Card className="w-full max-w-2xl mx-auto bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200 shadow-xl">
       <CardHeader className="bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-t-lg">
-        <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
-          <Sparkles size={28} />
-          Story Quiz
-          <Sparkles size={28} />
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
+            <Sparkles size={28} />
+            Story Quiz
+            <Sparkles size={28} />
+          </CardTitle>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={resetQuiz}
+            className="text-white/90 border-white/30 hover:bg-white/10"
+            aria-label="Generate a new quiz"
+          >
+            New Quiz
+          </Button>
+        </div>
         <div className="text-center text-blue-100 font-medium">
           Question {currentQuestion + 1} of {questions.length}
         </div>
