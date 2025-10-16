@@ -128,9 +128,10 @@ export function VideoGeneration({
 
   const handleDownload = () => {
     if (videoUrl) {
+      const isImage = videoUrl.startsWith('data:image') || /\.(png|jpe?g|gif|webp)$/i.test(videoUrl);
       const link = document.createElement('a');
       link.href = videoUrl;
-      link.download = 'story-animation.mp4';
+      link.download = isImage ? 'story-scene.png' : 'story-animation.mp4';
       link.target = '_blank';
       document.body.appendChild(link);
       link.click();
@@ -190,65 +191,45 @@ export function VideoGeneration({
       
       {videoUrl && (
         <div className="w-full relative">
-          <div className="rounded-xl overflow-hidden shadow-lg bg-black">
-            <video 
-              id="story-video"
-              src={videoUrl} 
-              className="w-full h-auto aspect-video object-contain"
-              onPlay={handleVideoPlay}
-              onPause={handleVideoPause}
-              onEnded={handleVideoEnded}
-              onError={() => setVideoUrl(fallbackVideoUrl)}
-              preload="metadata"
-            />
-            
-            {/* Custom video controls overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-                <Button
-                  onClick={togglePlayPause}
-                  size="sm"
-                  className="bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm"
-                >
-                  {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+          { (videoUrl.startsWith('data:image') || /\.(png|jpe?g|gif|webp)$/i.test(videoUrl)) ? (
+            <div className="rounded-xl overflow-hidden shadow-lg bg-black/5 flex flex-col items-center">
+              <img 
+                src={videoUrl}
+                alt="AI-generated story scene image"
+                className="w-full h-auto object-contain aspect-video"
+                loading="lazy"
+                onError={() => setVideoUrl(fallbackVideoUrl)}
+              />
+              <div className="p-4 flex items-center justify-center gap-2">
+                <Button onClick={handleDownload} size="sm" className="bg-kids-green hover:bg-kids-green/90 text-white">
+                  <Download className="w-4 h-4 mr-1" />
+                  Download Image
                 </Button>
-                
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleDownload}
-                    size="sm"
-                    className="bg-kids-green hover:bg-kids-green/90 text-white"
-                  >
-                    <Download className="w-4 h-4 mr-1" />
-                    Download
-                  </Button>
-                  
-                  <Button 
-                    onClick={handleGenerateVideo} 
-                    size="sm"
-                    className="bg-kids-orange hover:bg-kids-orange/90 text-white"
-                  >
-                    Regenerate
-                  </Button>
-                </div>
+                <Button onClick={handleGenerateVideo} size="sm" className="bg-kids-orange hover:bg-kids-orange/90 text-white">
+                  Regenerate
+                </Button>
               </div>
-              
-              {!isPlaying && (
-                <Button
-                  onClick={togglePlayPause}
-                  size="lg"
-                  className="bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm rounded-full w-16 h-16"
-                >
-                  <Play className="w-8 h-8 ml-1" />
-                </Button>
-              )}
             </div>
-          </div>
-          
+          ) : (
+            <div className="rounded-xl overflow-hidden shadow-lg bg-black">
+              <video 
+                id="story-video"
+                src={videoUrl}
+                className="w-full h-auto aspect-video object-contain"
+                onPlay={handleVideoPlay}
+                onPause={handleVideoPause}
+                onEnded={handleVideoEnded}
+                onError={() => setVideoUrl(fallbackVideoUrl)}
+                preload="metadata"
+                controls
+              />
+            </div>
+          )}
+
           <div className="mt-4 text-center">
             <p className="text-sm text-gray-600">
-              Your story has been transformed into an animated video! 
-              Click play to watch your tale come to life.
+              Your story has been transformed into an animated scene! 
+              { (videoUrl.startsWith('data:image') || /\.(png|jpe?g|gif|webp)$/i.test(videoUrl)) ? 'This is a generated image based on your story.' : 'Click play to watch your tale come to life.' }
             </p>
           </div>
         </div>

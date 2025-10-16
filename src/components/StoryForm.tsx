@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 type StoryFormProps = {
   onStoryGenerated: (storyText: string, theme: string) => void;
@@ -43,17 +44,33 @@ export function StoryForm({ onStoryGenerated, isGenerating, setIsGenerating }: S
     setIsGenerating(true);
     
     try {
-      // In a real implementation, this would call the Gemini API
-      // For now, we'll simulate a delay and return a mock story
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const mockStory = `Once upon a time, there was a ${mainCharacter} who lived in ${setting}. 
-      Every day was filled with ${theme} and excitement. 
-      ${additionalDetails ? `The ${mainCharacter} had a special secret: ${additionalDetails}.` : ''}
-      One day, something magical happened that would change everything...`;
-      
-      onStoryGenerated(mockStory, theme);
-      toast.success("Your story has been created!");
+      const { data, error } = await supabase.functions.invoke('generate-story', {
+        body: {
+          mainCharacter,
+          setting,
+          theme,
+          details: additionalDetails
+        }
+      });
+
+      if (error) {
+        if (error.message?.includes('429')) {
+          toast.error('Too many requests. Please try again shortly.');
+        } else if (error.message?.includes('402')) {
+          toast.error('AI credits exhausted. Please add credits to continue.');
+        } else {
+          toast.error('Failed to generate story. Please try again.');
+        }
+        return;
+      }
+
+      if (!data?.storyText) {
+        toast.error('Story generation returned no content.');
+        return;
+      }
+
+      onStoryGenerated(data.storyText, theme);
+      toast.success('Your story has been created!');
     } catch (error) {
       console.error("Error generating story:", error);
       toast.error("Failed to generate story. Please try again.");

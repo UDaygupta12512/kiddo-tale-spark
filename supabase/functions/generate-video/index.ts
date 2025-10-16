@@ -13,6 +13,7 @@ serve(async (req) => {
   try {
     const { storyText, theme } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const nonce = crypto.randomUUID();
     
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');
@@ -32,7 +33,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'user',
-            content: `Create a colorful, animated, child-friendly video scene for this story (theme: ${theme}): ${storyText}. Make it vibrant and magical for children aged 3-12. Style: cartoon animation, bright colors, whimsical, fun.`
+            content: `Create a colorful, animated, child-friendly video scene for this story (theme: ${theme}). Ensure each generation is visually distinct even for similar prompts. Use this unique token to vary composition: ${nonce}.\n\nStory:\n${storyText}\n\nStyle: cartoon animation, bright colors, whimsical, fun, cinematic framing, dynamic composition.`
           }
         ],
         modalities: ['image', 'text']
