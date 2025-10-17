@@ -129,6 +129,18 @@ export default {
 				'bounce-gentle': 'bounce-gentle 2s ease-in-out infinite',
 				'fade-in': 'fade-in 0.6s ease-out'
 			},
+			transformStyle: {
+				'3d': 'preserve-3d',
+			},
+			backfaceVisibility: {
+				'hidden': 'hidden',
+			},
+			perspective: {
+				'1000': '1000px',
+			},
+			rotate: {
+				'y-180': 'rotateY(180deg)',
+			},
 			fontFamily: {
 				'comic': ['"Comic Neue"', 'cursive'],
 			}

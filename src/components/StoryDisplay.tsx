@@ -7,6 +7,8 @@ import { WordExplorer } from './WordExplorer';
 import { StoryRemixer } from './StoryRemixer';
 import { StoryCertificate } from './StoryCertificate';
 import { StoryPDFExport } from './StoryPDFExport';
+import { Flashcards } from './Flashcards';
+import { Rhymes } from './Rhymes';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
@@ -53,12 +55,14 @@ export function StoryDisplay({
       <h2 className="text-2xl font-bold mb-6 text-center text-kids-purple">Your Story</h2>
       
       <Tabs defaultValue="story" className="w-full">
-        <TabsList className="grid w-full grid-cols-5 mb-6">
+        <TabsList className="grid w-full grid-cols-7 mb-6">
           <TabsTrigger value="story">📖 Story</TabsTrigger>
           <TabsTrigger value="narrate">🎧 Narrate</TabsTrigger>
           <TabsTrigger value="explore">📚 Explore</TabsTrigger>
           <TabsTrigger value="remix">✨ Remix</TabsTrigger>
           <TabsTrigger value="rewards">🏆 Rewards</TabsTrigger>
+          <TabsTrigger value="flashcards">🃏 Cards</TabsTrigger>
+          <TabsTrigger value="rhymes">🎵 Rhymes</TabsTrigger>
         </TabsList>
 
         <TabsContent value="story">
@@ -144,6 +148,14 @@ export function StoryDisplay({
           <StoryCertificate 
             storyTitle={`${theme || 'My Amazing'} Story`}
           />
+        </TabsContent>
+
+        <TabsContent value="flashcards">
+          <Flashcards storyText={displayStory} />
+        </TabsContent>
+
+        <TabsContent value="rhymes">
+          <Rhymes />
         </TabsContent>
       </Tabs>
     </div>
