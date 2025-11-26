@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StoryQuiz } from "@/components/StoryQuiz";
 import { FinishTheStory } from "@/components/FinishTheStory";
 import { ColoringPages } from "@/components/ColoringPages";
+import StoryChallenges from "@/components/StoryChallenges";
 
 const Games = () => {
   const [currentStory, setCurrentStory] = useState<string>("");
@@ -46,7 +47,7 @@ const Games = () => {
           </div>
 
           <Tabs defaultValue="quiz" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-8 bg-white shadow-lg rounded-xl border-2 border-purple-200">
+            <TabsList className="grid w-full grid-cols-4 mb-8 bg-white shadow-lg rounded-xl border-2 border-purple-200">
               <TabsTrigger 
                 value="quiz" 
                 className="text-purple-600 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white transition-all duration-200 rounded-lg font-semibold"
@@ -65,6 +66,12 @@ const Games = () => {
               >
                 🎨 Coloring Pages
               </TabsTrigger>
+              <TabsTrigger 
+                value="challenges" 
+                className="text-green-600 data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-teal-500 data-[state=active]:text-white transition-all duration-200 rounded-lg font-semibold"
+              >
+                🏆 Challenges
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="quiz" className="mt-6 animate-fade-in">
@@ -77,6 +84,10 @@ const Games = () => {
 
             <TabsContent value="coloring" className="mt-6 animate-fade-in">
               <ColoringPages />
+            </TabsContent>
+
+            <TabsContent value="challenges" className="mt-6 animate-fade-in">
+              <StoryChallenges />
             </TabsContent>
           </Tabs>
         </div>

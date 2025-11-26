@@ -9,6 +9,8 @@ import { StoryCertificate } from './StoryCertificate';
 import { StoryPDFExport } from './StoryPDFExport';
 import { Flashcards } from './Flashcards';
 import { Rhymes } from './Rhymes';
+import StoryQuizAI from './StoryQuizAI';
+import StoryTheater from './StoryTheater';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
@@ -55,7 +57,7 @@ export function StoryDisplay({
       <h2 className="text-2xl font-bold mb-6 text-center text-kids-purple">Your Story</h2>
       
       <Tabs defaultValue="story" className="w-full">
-        <TabsList className="grid w-full grid-cols-7 mb-6">
+        <TabsList className="grid w-full grid-cols-9 mb-6">
           <TabsTrigger value="story">📖 Story</TabsTrigger>
           <TabsTrigger value="narrate">🎧 Narrate</TabsTrigger>
           <TabsTrigger value="explore">📚 Explore</TabsTrigger>
@@ -63,6 +65,8 @@ export function StoryDisplay({
           <TabsTrigger value="rewards">🏆 Rewards</TabsTrigger>
           <TabsTrigger value="flashcards">🃏 Cards</TabsTrigger>
           <TabsTrigger value="rhymes">🎵 Rhymes</TabsTrigger>
+          <TabsTrigger value="quiz">❓ Quiz</TabsTrigger>
+          <TabsTrigger value="theater">🎭 Theater</TabsTrigger>
         </TabsList>
 
         <TabsContent value="story">
@@ -156,6 +160,14 @@ export function StoryDisplay({
 
         <TabsContent value="rhymes">
           <Rhymes />
+        </TabsContent>
+
+        <TabsContent value="quiz">
+          <StoryQuizAI storyText={displayStory} />
+        </TabsContent>
+
+        <TabsContent value="theater">
+          <StoryTheater storyText={displayStory} theme={theme} />
         </TabsContent>
       </Tabs>
     </div>
