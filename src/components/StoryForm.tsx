@@ -36,6 +36,15 @@ export function StoryForm({ onStoryGenerated, isGenerating, setIsGenerating }: S
     { value: "friendship", label: "Friendship" },
     { value: "animals", label: "Animal Stories" },
     { value: "space", label: "Space Exploration" },
+    { value: "halloween", label: "🎃 Halloween Special" },
+    { value: "christmas", label: "🎄 Christmas Magic" },
+    { value: "valentines", label: "💝 Valentine's Day" },
+    { value: "easter", label: "🐰 Easter Adventure" },
+    { value: "thanksgiving", label: "🦃 Thanksgiving" },
+    { value: "birthday", label: "🎂 Birthday Celebration" },
+    { value: "newyear", label: "🎆 New Year's Eve" },
+    { value: "summer", label: "☀️ Summer Vacation" },
+    { value: "winter", label: "❄️ Winter Wonderland" },
   ];
 
   const handleGenerateStory = async () => {

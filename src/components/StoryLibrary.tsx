@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { BookOpen, Trash2, Eye } from 'lucide-react';
+import { BookOpen, Trash2, Eye, Star, Tag, FolderOpen } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -9,6 +9,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type SavedStory = {
   id: string;
@@ -16,6 +25,9 @@ type SavedStory = {
   text: string;
   theme: string;
   timestamp: number;
+  tags?: string[];
+  rating?: number;
+  collection?: string;
 };
 
 type StoryLibraryProps = {
@@ -28,6 +40,9 @@ export function StoryLibrary({ currentStory, currentTheme, onLoadStory }: StoryL
   const [savedStories, setSavedStories] = useState<SavedStory[]>([]);
   const [selectedStory, setSelectedStory] = useState<SavedStory | null>(null);
   const [showDialog, setShowDialog] = useState(false);
+  const [newTag, setNewTag] = useState("");
+  const [filterTag, setFilterTag] = useState("all");
+  const [filterCollection, setFilterCollection] = useState("all");
 
   useEffect(() => {
     loadStoriesFromStorage();
@@ -80,6 +95,56 @@ export function StoryLibrary({ currentStory, currentTheme, onLoadStory }: StoryL
     }
   };
 
+  const addTag = (storyId: string, tag: string) => {
+    if (!tag.trim()) return;
+    const updated = savedStories.map(s => 
+      s.id === storyId 
+        ? { ...s, tags: [...(s.tags || []), tag.trim()] }
+        : s
+    );
+    setSavedStories(updated);
+    localStorage.setItem('savedStories', JSON.stringify(updated));
+    setNewTag("");
+    toast.success("Tag added!");
+  };
+
+  const removeTag = (storyId: string, tagToRemove: string) => {
+    const updated = savedStories.map(s =>
+      s.id === storyId
+        ? { ...s, tags: (s.tags || []).filter(t => t !== tagToRemove) }
+        : s
+    );
+    setSavedStories(updated);
+    localStorage.setItem('savedStories', JSON.stringify(updated));
+  };
+
+  const rateStory = (storyId: string, rating: number) => {
+    const updated = savedStories.map(s =>
+      s.id === storyId ? { ...s, rating } : s
+    );
+    setSavedStories(updated);
+    localStorage.setItem('savedStories', JSON.stringify(updated));
+    toast.success(`Rated ${rating} stars!`);
+  };
+
+  const setCollection = (storyId: string, collection: string) => {
+    const updated = savedStories.map(s =>
+      s.id === storyId ? { ...s, collection } : s
+    );
+    setSavedStories(updated);
+    localStorage.setItem('savedStories', JSON.stringify(updated));
+    toast.success("Collection updated!");
+  };
+
+  const allTags = Array.from(new Set(savedStories.flatMap(s => s.tags || [])));
+  const allCollections = Array.from(new Set(savedStories.map(s => s.collection).filter(Boolean)));
+
+  const filteredStories = savedStories.filter(story => {
+    const matchesTag = filterTag === "all" || (story.tags || []).includes(filterTag);
+    const matchesCollection = filterCollection === "all" || story.collection === filterCollection;
+    return matchesTag && matchesCollection;
+  });
+
   return (
     <div className="story-card p-6">
       <div className="flex items-center justify-between mb-6">
@@ -97,13 +162,45 @@ export function StoryLibrary({ currentStory, currentTheme, onLoadStory }: StoryL
         )}
       </div>
 
+      {savedStories.length > 0 && (
+        <div className="flex flex-wrap gap-3 mb-6">
+          <Select value={filterTag} onValueChange={setFilterTag}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by tag" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Tags</SelectItem>
+              {allTags.map(tag => (
+                <SelectItem key={tag} value={tag}>{tag}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={filterCollection} onValueChange={setFilterCollection}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Filter by collection" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Collections</SelectItem>
+              {allCollections.map(col => (
+                <SelectItem key={col} value={col!}>{col}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
       {savedStories.length === 0 ? (
         <p className="text-center text-gray-500 py-8">
           No saved stories yet. Create and save your first story!
         </p>
+      ) : filteredStories.length === 0 ? (
+        <p className="text-center text-gray-500 py-8">
+          No stories match the selected filters.
+        </p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {savedStories.map((story) => (
+          {filteredStories.map((story) => (
             <Card key={story.id} className="p-4 hover:shadow-lg transition-shadow border-l-4 border-kids-purple">
               <div className="space-y-3">
                 <div>
@@ -113,9 +210,48 @@ export function StoryLibrary({ currentStory, currentTheme, onLoadStory }: StoryL
                   <h4 className="font-semibold text-sm mt-1 line-clamp-2">
                     {story.title}
                   </h4>
-                  <span className="inline-block mt-2 px-2 py-1 bg-kids-blue/10 text-kids-blue text-xs rounded">
-                    {story.theme}
-                  </span>
+                  
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="inline-block px-2 py-1 bg-kids-blue/10 text-kids-blue text-xs rounded">
+                      {story.theme}
+                    </span>
+                    {story.collection && (
+                      <Badge variant="outline" className="text-xs">
+                        <FolderOpen className="w-3 h-3 mr-1" />
+                        {story.collection}
+                      </Badge>
+                    )}
+                  </div>
+
+                  {/* Rating Display */}
+                  <div className="flex items-center gap-1 mt-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`w-4 h-4 cursor-pointer transition-colors ${
+                          story.rating && star <= story.rating
+                            ? "fill-kids-yellow text-kids-yellow"
+                            : "text-gray-300"
+                        }`}
+                        onClick={() => rateStory(story.id, star)}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {(story.tags || []).map((tag) => (
+                      <Badge
+                        key={tag}
+                        variant="secondary"
+                        className="text-xs cursor-pointer"
+                        onClick={() => removeTag(story.id, tag)}
+                      >
+                        <Tag className="w-3 h-3 mr-1" />
+                        {tag} ×
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
                 
                 <div className="flex gap-2">
@@ -155,6 +291,36 @@ export function StoryLibrary({ currentStory, currentTheme, onLoadStory }: StoryL
                   <p key={idx} className="mb-3">{paragraph}</p>
                 ))}
               </div>
+
+              {/* Add Tag */}
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Add a tag..."
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      addTag(selectedStory.id, newTag);
+                    }
+                  }}
+                />
+                <Button
+                  onClick={() => addTag(selectedStory.id, newTag)}
+                  className="bg-kids-green text-white"
+                >
+                  <Tag className="w-4 h-4" />
+                </Button>
+              </div>
+
+              {/* Add to Collection */}
+              <div>
+                <Input
+                  placeholder="Collection name (e.g., 'Favorites', 'Bedtime Stories')"
+                  value={selectedStory.collection || ""}
+                  onChange={(e) => setCollection(selectedStory.id, e.target.value)}
+                />
+              </div>
+
               <Button
                 onClick={() => loadStory(selectedStory)}
                 className="w-full bg-gradient-to-r from-kids-purple to-kids-blue text-white"
