@@ -8,6 +8,10 @@ import { StoryQuiz } from "@/components/StoryQuiz";
 import { FinishTheStory } from "@/components/FinishTheStory";
 import { ColoringPages } from "@/components/ColoringPages";
 import StoryChallenges from "@/components/StoryChallenges";
+import { WordScramble } from "@/components/WordScramble";
+import { MemoryMatch } from "@/components/MemoryMatch";
+import { StorySequencing } from "@/components/StorySequencing";
+import { SpotDifference } from "@/components/SpotDifference";
 
 const Games = () => {
   const [currentStory, setCurrentStory] = useState<string>("");
@@ -47,30 +51,54 @@ const Games = () => {
           </div>
 
           <Tabs defaultValue="quiz" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 mb-8 bg-white shadow-lg rounded-xl border-2 border-purple-200">
+            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 mb-8 bg-white shadow-lg rounded-xl border-2 border-purple-200">
               <TabsTrigger 
                 value="quiz" 
-                className="text-purple-600 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white transition-all duration-200 rounded-lg font-semibold"
+                className="text-purple-600 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white transition-all duration-200 rounded-lg font-semibold text-xs sm:text-sm"
               >
-                📝 Story Quiz
+                📝 Quiz
               </TabsTrigger>
               <TabsTrigger 
                 value="finish" 
-                className="text-blue-600 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white transition-all duration-200 rounded-lg font-semibold"
+                className="text-blue-600 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white transition-all duration-200 rounded-lg font-semibold text-xs sm:text-sm"
               >
-                ✍️ Finish the Story
+                ✍️ Finish
               </TabsTrigger>
               <TabsTrigger 
                 value="coloring" 
-                className="text-orange-600 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-pink-500 data-[state=active]:text-white transition-all duration-200 rounded-lg font-semibold"
+                className="text-orange-600 data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-pink-500 data-[state=active]:text-white transition-all duration-200 rounded-lg font-semibold text-xs sm:text-sm"
               >
-                🎨 Coloring Pages
+                🎨 Color
               </TabsTrigger>
               <TabsTrigger 
                 value="challenges" 
-                className="text-green-600 data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-teal-500 data-[state=active]:text-white transition-all duration-200 rounded-lg font-semibold"
+                className="text-green-600 data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-teal-500 data-[state=active]:text-white transition-all duration-200 rounded-lg font-semibold text-xs sm:text-sm"
               >
                 🏆 Challenges
+              </TabsTrigger>
+              <TabsTrigger 
+                value="scramble" 
+                className="text-yellow-600 data-[state=active]:bg-gradient-to-r data-[state=active]:from-yellow-500 data-[state=active]:to-orange-500 data-[state=active]:text-white transition-all duration-200 rounded-lg font-semibold text-xs sm:text-sm"
+              >
+                🔤 Scramble
+              </TabsTrigger>
+              <TabsTrigger 
+                value="memory" 
+                className="text-pink-600 data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-purple-500 data-[state=active]:text-white transition-all duration-200 rounded-lg font-semibold text-xs sm:text-sm"
+              >
+                🧠 Memory
+              </TabsTrigger>
+              <TabsTrigger 
+                value="sequence" 
+                className="text-teal-600 data-[state=active]:bg-gradient-to-r data-[state=active]:from-teal-500 data-[state=active]:to-blue-500 data-[state=active]:text-white transition-all duration-200 rounded-lg font-semibold text-xs sm:text-sm"
+              >
+                📋 Sequence
+              </TabsTrigger>
+              <TabsTrigger 
+                value="difference" 
+                className="text-indigo-600 data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-500 data-[state=active]:text-white transition-all duration-200 rounded-lg font-semibold text-xs sm:text-sm"
+              >
+                👁️ Spot It
               </TabsTrigger>
             </TabsList>
 
@@ -88,6 +116,22 @@ const Games = () => {
 
             <TabsContent value="challenges" className="mt-6 animate-fade-in">
               <StoryChallenges />
+            </TabsContent>
+
+            <TabsContent value="scramble" className="mt-6 animate-fade-in">
+              <WordScramble storyText={currentStory} />
+            </TabsContent>
+
+            <TabsContent value="memory" className="mt-6 animate-fade-in">
+              <MemoryMatch />
+            </TabsContent>
+
+            <TabsContent value="sequence" className="mt-6 animate-fade-in">
+              <StorySequencing storyText={currentStory} />
+            </TabsContent>
+
+            <TabsContent value="difference" className="mt-6 animate-fade-in">
+              <SpotDifference />
             </TabsContent>
           </Tabs>
         </div>
