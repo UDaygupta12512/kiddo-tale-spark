@@ -4,8 +4,9 @@ import { Footer } from '@/components/Footer';
 import { BackButton } from '@/components/BackButton';
 import { CharacterBuilder } from '@/components/CharacterBuilder';
 import { StoryLibrary } from '@/components/StoryLibrary';
+import { BranchingStory } from '@/components/BranchingStory';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sparkles, BookOpen, Users } from 'lucide-react';
+import { Sparkles, BookOpen, Users, GitBranch } from 'lucide-react';
 
 export default function Creative() {
   const [currentStory, setCurrentStory] = useState("");
@@ -33,7 +34,7 @@ export default function Creative() {
         </div>
 
         <Tabs defaultValue="characters" className="w-full max-w-6xl mx-auto">
-          <TabsList className="grid w-full grid-cols-2 mb-8">
+          <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger 
               value="characters"
               className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-kids-purple data-[state=active]:to-kids-blue data-[state=active]:text-white"
@@ -47,6 +48,13 @@ export default function Creative() {
             >
               <BookOpen className="w-4 h-4 mr-2" />
               Story Library
+            </TabsTrigger>
+            <TabsTrigger 
+              value="branching"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-kids-orange data-[state=active]:to-kids-blue data-[state=active]:text-white"
+            >
+              <GitBranch className="w-4 h-4 mr-2" />
+              Interactive Story
             </TabsTrigger>
           </TabsList>
 
@@ -94,6 +102,27 @@ export default function Creative() {
                     <li>📖 View and re-read your favorite stories anytime</li>
                     <li>🔄 Load saved stories to continue or remix them</li>
                     <li>🗑️ Delete stories you no longer need</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="branching" className="animate-fade-in">
+            <BranchingStory theme="adventure" />
+            
+            <div className="mt-6 p-6 story-card bg-gradient-to-r from-kids-orange/10 to-kids-blue/10">
+              <div className="flex items-start gap-3">
+                <GitBranch className="w-6 h-6 text-kids-orange flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-bold text-lg text-kids-orange mb-2">
+                    Interactive Story Tips
+                  </h3>
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    <li>🎯 Every choice you make changes the story path!</li>
+                    <li>⭐ Earn points for each decision you make</li>
+                    <li>🔄 Try different choices to discover all the endings</li>
+                    <li>📚 Each ending teaches a valuable lesson</li>
                   </ul>
                 </div>
               </div>
