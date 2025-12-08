@@ -12,6 +12,8 @@ import { WordScramble } from "@/components/WordScramble";
 import { MemoryMatch } from "@/components/MemoryMatch";
 import { StorySequencing } from "@/components/StorySequencing";
 import { SpotDifference } from "@/components/SpotDifference";
+import { AudioStories } from "@/components/AudioStories";
+import { InteractiveConversations } from "@/components/InteractiveConversations";
 
 const Games = () => {
   const [currentStory, setCurrentStory] = useState<string>("");
@@ -51,7 +53,7 @@ const Games = () => {
           </div>
 
           <Tabs defaultValue="quiz" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 mb-8 bg-white shadow-lg rounded-xl border-2 border-purple-200">
+            <TabsList className="grid w-full grid-cols-5 lg:grid-cols-10 mb-8 bg-white shadow-lg rounded-xl border-2 border-purple-200">
               <TabsTrigger 
                 value="quiz" 
                 className="text-purple-600 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white transition-all duration-200 rounded-lg font-semibold text-xs sm:text-sm"
@@ -100,6 +102,18 @@ const Games = () => {
               >
                 👁️ Spot It
               </TabsTrigger>
+              <TabsTrigger 
+                value="audio" 
+                className="text-rose-600 data-[state=active]:bg-gradient-to-r data-[state=active]:from-rose-500 data-[state=active]:to-purple-500 data-[state=active]:text-white transition-all duration-200 rounded-lg font-semibold text-xs sm:text-sm"
+              >
+                🎧 Audio
+              </TabsTrigger>
+              <TabsTrigger 
+                value="conversations" 
+                className="text-cyan-600 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-500 data-[state=active]:text-white transition-all duration-200 rounded-lg font-semibold text-xs sm:text-sm"
+              >
+                💬 Talk
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="quiz" className="mt-6 animate-fade-in">
@@ -132,6 +146,14 @@ const Games = () => {
 
             <TabsContent value="difference" className="mt-6 animate-fade-in">
               <SpotDifference />
+            </TabsContent>
+
+            <TabsContent value="audio" className="mt-6 animate-fade-in">
+              <AudioStories />
+            </TabsContent>
+
+            <TabsContent value="conversations" className="mt-6 animate-fade-in">
+              <InteractiveConversations />
             </TabsContent>
           </Tabs>
         </div>
